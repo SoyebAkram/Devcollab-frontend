@@ -6,12 +6,14 @@ import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import KanbanPage from './pages/KanbanPage';
 import BugTracker from './pages/BugTracker';
+import AuditLog from './pages/AuditLog';
 import { 
   LogOut, 
   LayoutDashboard, 
   Bug, 
   FolderKanban, 
-  FolderGit2,
+  FolderGit2, 
+  History,
   Bell,
   Smartphone,
   Monitor
@@ -46,6 +48,7 @@ function Layout({ children }) {
     { label: 'Projects', path: '/projects', icon: FolderGit2 },
     { label: 'Kanban Board', path: '/kanban', icon: FolderKanban },
     { label: 'Bug Tracker', path: '/bugs', icon: Bug },
+    { label: 'Audit Log', path: '/audit', icon: History },
   ];
 
   return (
@@ -239,6 +242,7 @@ function ProtectedApp() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/kanban" element={<KanbanPage />} />
         <Route path="/bugs" element={<BugTracker />} />
+        <Route path="/audit" element={<AuditLog />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
