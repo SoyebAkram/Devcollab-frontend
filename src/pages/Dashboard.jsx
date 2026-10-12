@@ -6,18 +6,19 @@ import {
   FolderKanban, 
   Bug, 
   Clock, 
-  Users,
-  Calendar,
-  ArrowUpRight,
-  Printer,
-  TrendingUp,
-  Activity,
-  CheckCircle2,
-  FileText,
-  Sparkles,
-  Copy,
-  Check,
-  X
+  Users, 
+  Calendar, 
+  ArrowUpRight, 
+  Printer, 
+  TrendingUp, 
+  Activity, 
+  CheckCircle2, 
+  FileText, 
+  Sparkles, 
+  Copy, 
+  Check, 
+  X,
+  Target
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -150,7 +151,6 @@ Name: ${user?.name} [${isProjectManager ? 'Project Manager' : 'Developer'}]
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* Smart Daily Standup Generator Button */}
           <button
             onClick={() => setShowStandupModal(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-500/30 rounded-xl text-xs font-semibold transition cursor-pointer"
@@ -158,7 +158,6 @@ Name: ${user?.name} [${isProjectManager ? 'Project Manager' : 'Developer'}]
             <Sparkles size={15} /> Daily Standup
           </button>
 
-          {/* Export Sprint Report */}
           <button
             onClick={() => setShowReportModal(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer"
@@ -248,7 +247,6 @@ Name: ${user?.name} [${isProjectManager ? 'Project Manager' : 'Developer'}]
           </div>
         </div>
 
-        {/* Bar Chart Representation */}
         <div className="grid grid-cols-10 gap-2 items-end h-40 pt-4 px-2 border-b border-slate-800">
           {sprintWeeks.map((item, idx) => (
             <div key={idx} className="flex flex-col items-center h-full justify-end group">
@@ -279,7 +277,7 @@ Name: ${user?.name} [${isProjectManager ? 'Project Manager' : 'Developer'}]
         </div>
       </div>
 
-      {/* Two Column: Deadlines & Activity Audit Log */}
+      {/* Two Column: Deadlines & (Audit Log for PM OR Developer Work Focus for Dev) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-5">
@@ -332,33 +330,75 @@ Name: ${user?.name} [${isProjectManager ? 'Project Manager' : 'Developer'}]
           </div>
         </div>
 
-        {/* Right Column: Activity Audit Log */}
+        {/* Right Column: PM sees Audit Stream, Developer sees Personal Work Focus */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Activity size={16} className="text-blue-400" />
-              <h2 className="text-base font-bold text-white tracking-tight">Audit Activity Stream</h2>
-            </div>
-            <p className="text-xs text-slate-400 mb-5">Chronological record of project operations</p>
-
-            <div className="space-y-4">
-              {auditActivityLog.map((log, i) => (
-                <div key={i} className="flex gap-3 text-xs">
-                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                    log.type === 'TASK' ? 'bg-orange-500' : log.type === 'BUG' ? 'bg-rose-500' : 'bg-emerald-500'
-                  }`} />
-                  <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-white">{log.action}</span>
-                      <span className="text-[10px] text-slate-500">{log.timestamp}</span>
-                    </div>
-                    <p className="text-slate-400 leading-relaxed mt-0.5">{log.detail}</p>
-                    <span className="text-[10px] text-slate-500 block mt-1">Actor: {log.actor}</span>
-                  </div>
+          {isProjectManager ? (
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <Activity size={16} className="text-orange-400" />
+                  <h2 className="text-base font-bold text-white tracking-tight">Audit Stream (PM Only)</h2>
                 </div>
-              ))}
+                <Link to="/audit" className="text-[11px] text-orange-400 hover:text-orange-300 font-semibold">
+                  Full Log →
+                </Link>
+              </div>
+              <p className="text-xs text-slate-400 mb-5">Chronological record of team operations</p>
+
+              <div className="space-y-4">
+                {auditActivityLog.map((log, i) => (
+                  <div key={i} className="flex gap-3 text-xs">
+                    <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+                      log.type === 'TASK' ? 'bg-orange-500' : log.type === 'BUG' ? 'bg-rose-500' : 'bg-emerald-500'
+                    }`} />
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold text-white">{log.action}</span>
+                        <span className="text-[10px] text-slate-500">{log.timestamp}</span>
+                      </div>
+                      <p className="text-slate-400 leading-relaxed mt-0.5">{log.detail}</p>
+                      <span className="text-[10px] text-slate-500 block mt-1">Actor: {log.actor}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Target size={16} className="text-blue-400" />
+                <h2 className="text-base font-bold text-white tracking-tight">Developer Sprint Focus</h2>
+              </div>
+              <p className="text-xs text-slate-400 mb-5">Your assigned tasks and defects</p>
+
+              <div className="space-y-3 text-xs">
+                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-white">Active Assigned Tasks</span>
+                    <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold text-[10px]">3 Tasks</span>
+                  </div>
+                  <p className="text-slate-400 text-[11px]">Design PostgreSQL Schema with Alembic</p>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-white">Reported Defects</span>
+                    <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">1 Open</span>
+                  </div>
+                  <p className="text-slate-400 text-[11px]">Login button on mobile viewports</p>
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <Link
+                  to="/kanban"
+                  className="block text-center w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition"
+                >
+                  Go to My Tasks
+                </Link>
+              </div>
+            </div>
+          )}
 
           <div className="pt-6 border-t border-slate-800/80 mt-6">
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">

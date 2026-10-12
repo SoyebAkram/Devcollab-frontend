@@ -23,7 +23,7 @@ function Layout({ children }) {
   const { user, logout, isProjectManager } = useAuth();
   const location = useLocation();
 
-  const [deviceMode, setDeviceMode] = useState('desktop'); // 'desktop' | 'mobile'
+  const [deviceMode, setDeviceMode] = useState('desktop');
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'Soyeb Akram assigned you to "FastAPI Backend & DB"', time: '2h ago', read: false },
     { id: 2, text: 'Shihab Shoron reported High-priority bug #101', time: '4h ago', read: false },
@@ -43,12 +43,13 @@ function Layout({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Audit Log is only shown in sidebar for Project Manager
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Projects', path: '/projects', icon: FolderGit2 },
     { label: 'Kanban Board', path: '/kanban', icon: FolderKanban },
     { label: 'Bug Tracker', path: '/bugs', icon: Bug },
-    { label: 'Audit Log', path: '/audit', icon: History },
+    ...(isProjectManager ? [{ label: 'Audit Log', path: '/audit', icon: History }] : []),
   ];
 
   return (
@@ -208,19 +209,15 @@ function Layout({ children }) {
             <span>Interactive Mobile Viewport Preview (390px)</span>
           </div>
 
-          {/* Smartphone Hardware Frame Mockup */}
           <div className="w-[390px] h-[810px] bg-slate-900 border-[6px] border-slate-700/80 rounded-[44px] shadow-2xl overflow-hidden flex flex-col relative ring-2 ring-slate-800">
-            {/* Dynamic Island / Notch */}
             <div className="h-6 bg-slate-950 flex items-center justify-center shrink-0">
               <div className="w-20 h-3.5 bg-slate-800 rounded-full" />
             </div>
 
-            {/* Scrollable Mobile Screen */}
             <main className="flex-1 overflow-y-auto p-4 bg-slate-950">
               {children}
             </main>
 
-            {/* Bottom Home Indicator Bar */}
             <div className="h-4 bg-slate-950 flex items-center justify-center shrink-0">
               <div className="w-32 h-1 bg-slate-600 rounded-full" />
             </div>
@@ -232,7 +229,7 @@ function Layout({ children }) {
 }
 
 function ProtectedApp() {
-  const { user } = useAuth();
+  const { user, isProjectManager } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
 
   return (
@@ -242,7 +239,11 @@ function ProtectedApp() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/kanban" element={<KanbanPage />} />
         <Route path="/bugs" element={<BugTracker />} />
-        <Route path="/audit" element={<AuditLog />} />
+        {/* Route Guard: Strictly Project Manager Only */}
+        <Route 
+          path="/audit" 
+          element={isProjectManager ? <AuditLog /> : <Navigate to="/dashboard" replace />} 
+        />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
