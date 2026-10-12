@@ -13,12 +13,18 @@ import {
   TrendingUp,
   Activity,
   CheckCircle2,
-  FileText
+  FileText,
+  Sparkles,
+  Copy,
+  Check,
+  X
 } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, isProjectManager } = useAuth();
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showStandupModal, setShowStandupModal] = useState(false);
+  const [copiedStandup, setCopiedStandup] = useState(false);
 
   const projectStats = {
     totalProjects: 3,
@@ -100,8 +106,25 @@ export default function Dashboard() {
     }
   ];
 
-  const handlePrintReport = () => {
-    window.print();
+  const generatedStandupText = `🎯 DevCollab Daily Standup (${new Date().toLocaleDateString()})
+Name: ${user?.name} [${isProjectManager ? 'Project Manager' : 'Developer'}]
+
+ Yesterday Completed:
+• Setup JWT Authentication API & role authorization
+• Verified PM-only Kanban movement guards
+
+⚡ Today's Plan:
+• Continue PostgreSQL Schema modeling with Alembic
+• Integrate real-time notification listener
+
+🛑 Blockers / Defect Alerts:
+• Bug #101: "Login button mobile viewport" needs review
+• Sprint Velocity: 68% (Ahead of Week 5 target)`;
+
+  const handleCopyStandup = () => {
+    navigator.clipboard.writeText(generatedStandupText);
+    setCopiedStandup(true);
+    setTimeout(() => setCopiedStandup(false), 2000);
   };
 
   return (
@@ -127,17 +150,27 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          {/* Smart Daily Standup Generator Button */}
+          <button
+            onClick={() => setShowStandupModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 border border-orange-500/30 rounded-xl text-xs font-semibold transition cursor-pointer"
+          >
+            <Sparkles size={15} /> Daily Standup
+          </button>
+
+          {/* Export Sprint Report */}
           <button
             onClick={() => setShowReportModal(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition cursor-pointer"
           >
-            <FileText size={15} className="text-orange-400" /> Export Sprint Report
+            <FileText size={15} /> Export Report
           </button>
+
           <Link
             to="/kanban"
             className="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-orange-600/20 transition cursor-pointer"
           >
-            <FolderKanban size={15} /> Open Kanban
+            <FolderKanban size={15} /> Kanban
           </Link>
         </div>
       </div>
@@ -289,7 +322,7 @@ export default function Dashboard() {
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
                     item.urgency === 'URGENT'
                       ? 'bg-rose-500/20 text-rose-400 border-rose-500/30'
-                      : 'bg-slate-800 text-slate-300 border-slate-700'
+                      : 'bg-slate-800 text-slate-300 border border-slate-700'
                   }`}>
                     {item.daysLeft}
                   </span>
@@ -339,11 +372,56 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Daily Standup Modal */}
+      {showStandupModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-800 max-w-lg w-full rounded-2xl p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles size={18} className="text-orange-400" />
+                <h3 className="text-base font-bold text-white">Daily Scrum Standup Summary</h3>
+              </div>
+              <button
+                onClick={() => setShowStandupModal(false)}
+                className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-400 mb-3">
+              Automated Agile standup report generated from your current task statuses and blocking issues:
+            </p>
+
+            <pre className="p-4 bg-slate-950 border border-slate-800 rounded-xl font-mono text-xs text-slate-200 whitespace-pre-wrap leading-relaxed mb-4">
+              {generatedStandupText}
+            </pre>
+
+            <div className="flex items-center justify-between pt-2">
+              <span className="text-[11px] text-slate-500">Ready to share in Slack, Teams, or Discord</span>
+              <button
+                onClick={handleCopyStandup}
+                className="flex items-center gap-1.5 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs font-semibold shadow-lg shadow-orange-600/20 transition cursor-pointer"
+              >
+                {copiedStandup ? (
+                  <>
+                    <Check size={14} className="text-emerald-300" /> Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy size={14} /> Copy Standup
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Printable Sprint Report Modal */}
       {showReportModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white text-slate-900 max-w-2xl w-full rounded-2xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-            {/* Header */}
             <div className="flex items-center justify-between pb-6 border-b border-slate-200 mb-6">
               <div>
                 <span className="text-xs font-bold text-orange-600 uppercase tracking-widest">
@@ -355,14 +433,13 @@ export default function Dashboard() {
                 </p>
               </div>
               <button
-                onClick={handlePrintReport}
+                onClick={() => window.print()}
                 className="flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition cursor-pointer"
               >
                 <Printer size={14} /> Print / Save as PDF
               </button>
             </div>
 
-            {/* Meta Details */}
             <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-xl text-xs">
               <div>
                 <span className="text-slate-500 block">Project Managers & Developers:</span>
@@ -375,7 +452,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Metrics Breakdown */}
             <div className="grid grid-cols-3 gap-3 mb-6 text-center text-xs">
               <div className="p-3 bg-slate-100 rounded-lg">
                 <span className="text-slate-500 block">Sprint Velocity</span>
@@ -391,28 +467,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Tasks Summary */}
-            <div className="mb-6 text-xs">
-              <h4 className="font-bold uppercase tracking-wider text-slate-700 mb-2">
-                Sprint Task Checklist
-              </h4>
-              <ul className="space-y-1.5">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 size={14} className="text-emerald-600" />
-                  <span>Setup JWT Authentication API (Done) — Shihab Shoron</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 size={14} className="text-blue-600" />
-                  <span>Design PostgreSQL Schema with Alembic (In Progress) — Shihab Shoron</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 size={14} className="text-slate-400" />
-                  <span>Build Kanban Drag & Drop View (To Do) — Soyeb Akram</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Modal Controls */}
             <div className="flex justify-end pt-4 border-t border-slate-200">
               <button
                 onClick={() => setShowReportModal(false)}

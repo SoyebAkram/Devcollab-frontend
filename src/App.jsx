@@ -12,13 +12,16 @@ import {
   Bug, 
   FolderKanban, 
   FolderGit2,
-  Bell
+  Bell,
+  Smartphone,
+  Monitor
 } from 'lucide-react';
 
 function Layout({ children }) {
   const { user, logout, isProjectManager } = useAuth();
   const location = useLocation();
 
+  const [deviceMode, setDeviceMode] = useState('desktop'); // 'desktop' | 'mobile'
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'Soyeb Akram assigned you to "FastAPI Backend & DB"', time: '2h ago', read: false },
     { id: 2, text: 'Shihab Shoron reported High-priority bug #101', time: '4h ago', read: false },
@@ -34,9 +37,7 @@ function Layout({ children }) {
 
   const handleBrandClick = () => {
     const mainEl = document.querySelector('main');
-    if (mainEl) {
-      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -56,7 +57,7 @@ function Layout({ children }) {
           <Link
             to="/dashboard"
             onClick={handleBrandClick}
-            className="flex items-center gap-2.5 mb-8 group cursor-pointer"
+            className="flex items-center gap-2.5 mb-6 group cursor-pointer"
             title="Go to Homepage"
           >
             <div className="w-8 h-8 rounded-lg bg-orange-600 group-hover:bg-orange-500 flex items-center justify-center font-bold text-white shadow-lg shadow-orange-600/30 transition">
@@ -66,6 +67,38 @@ function Layout({ children }) {
               DevCollab
             </span>
           </Link>
+
+          {/* Viewport Switcher Control Button */}
+          <div className="mb-6 p-2 bg-slate-950/80 border border-slate-800 rounded-xl">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400 mb-1.5 px-1">
+              <span>View Mode</span>
+              <span className="text-[10px] text-orange-400 uppercase font-bold">{deviceMode}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-1 bg-slate-900 p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setDeviceMode('desktop')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-medium transition cursor-pointer ${
+                  deviceMode === 'desktop'
+                    ? 'bg-orange-600 text-white shadow-sm font-semibold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Monitor size={13} /> Desktop
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeviceMode('mobile')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs font-medium transition cursor-pointer ${
+                  deviceMode === 'mobile'
+                    ? 'bg-orange-600 text-white shadow-sm font-semibold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Smartphone size={13} /> Phone
+              </button>
+            </div>
+          </div>
 
           <nav className="space-y-1.5 text-sm font-medium">
             {navItems.map((item) => {
@@ -96,8 +129,8 @@ function Layout({ children }) {
               <span
                 className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full inline-block mt-1 ${
                   isProjectManager
-                    ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-                    : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                 }`}
               >
                 {isProjectManager ? 'Project Manager' : 'Developer'}
@@ -160,8 +193,37 @@ function Layout({ children }) {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+      {/* Main Content View with Dynamic Desktop vs Phone Simulator */}
+      {deviceMode === 'desktop' ? (
+        <main className="flex-1 p-8 overflow-y-auto">
+          {children}
+        </main>
+      ) : (
+        <div className="flex-1 p-6 flex flex-col items-center justify-start overflow-y-auto bg-slate-950">
+          <div className="flex items-center gap-2 mb-3 text-xs text-slate-400 font-medium">
+            <Smartphone size={14} className="text-orange-400" />
+            <span>Interactive Mobile Viewport Preview (390px)</span>
+          </div>
+
+          {/* Smartphone Hardware Frame Mockup */}
+          <div className="w-[390px] h-[810px] bg-slate-900 border-[6px] border-slate-700/80 rounded-[44px] shadow-2xl overflow-hidden flex flex-col relative ring-2 ring-slate-800">
+            {/* Dynamic Island / Notch */}
+            <div className="h-6 bg-slate-950 flex items-center justify-center shrink-0">
+              <div className="w-20 h-3.5 bg-slate-800 rounded-full" />
+            </div>
+
+            {/* Scrollable Mobile Screen */}
+            <main className="flex-1 overflow-y-auto p-4 bg-slate-950">
+              {children}
+            </main>
+
+            {/* Bottom Home Indicator Bar */}
+            <div className="h-4 bg-slate-950 flex items-center justify-center shrink-0">
+              <div className="w-32 h-1 bg-slate-600 rounded-full" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
