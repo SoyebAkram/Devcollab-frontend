@@ -12,6 +12,14 @@ function Layout({ children }) {
   const { user, logout, isProjectManager } = useAuth();
   const location = useLocation();
 
+  const handleBrandClick = () => {
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Projects', path: '/projects', icon: FolderGit2 },
@@ -24,12 +32,20 @@ function Layout({ children }) {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between shrink-0">
         <div>
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center font-bold text-white shadow-lg shadow-orange-600/30">
+          {/* Brand Logo as Clickable Homepage Button */}
+          <Link
+            to="/dashboard"
+            onClick={handleBrandClick}
+            className="flex items-center gap-2.5 mb-8 group cursor-pointer"
+            title="Go to Homepage"
+          >
+            <div className="w-8 h-8 rounded-lg bg-orange-600 group-hover:bg-orange-500 flex items-center justify-center font-bold text-white shadow-lg shadow-orange-600/30 transition">
               D
             </div>
-            <span className="font-bold text-lg text-white tracking-tight">DevCollab</span>
-          </div>
+            <span className="font-bold text-lg text-white group-hover:text-orange-400 tracking-tight transition">
+              DevCollab
+            </span>
+          </Link>
 
           <nav className="space-y-1.5 text-sm font-medium">
             {navItems.map((item) => {
