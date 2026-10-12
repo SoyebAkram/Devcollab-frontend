@@ -10,7 +10,9 @@ import {
   Filter,
   Check,
   RotateCcw,
-  Trash2
+  Trash2,
+  Download,
+  Search
 } from 'lucide-react';
 
 const INITIAL_BUGS = [
@@ -23,6 +25,7 @@ const INITIAL_BUGS = [
     reportedBy: 'Shihab Shoron',
     assignedTo: 'Shihab Shoron',
     createdAt: '2026-10-10',
+    stackTrace: 'TypeError: Cannot read properties of undefined (reading "role") at Login.handleSubmit',
   },
   {
     id: 102,
@@ -33,6 +36,7 @@ const INITIAL_BUGS = [
     reportedBy: 'Soyeb Akram',
     assignedTo: 'Shihab Shoron',
     createdAt: '2026-10-08',
+    stackTrace: 'Access-Control-Allow-Origin header missing in response to preflight request',
   },
   {
     id: 103,
@@ -43,6 +47,7 @@ const INITIAL_BUGS = [
     reportedBy: 'Soyeb Akram',
     assignedTo: 'Soyeb Akram',
     createdAt: '2026-10-11',
+    stackTrace: '',
   },
   {
     id: 104,
@@ -53,6 +58,7 @@ const INITIAL_BUGS = [
     reportedBy: 'Shihab Shoron',
     assignedTo: 'Shihab Shoron',
     createdAt: '2026-10-06',
+    stackTrace: 'psycopg2.errors.DuplicateObject: type "user_role_enum" already exists',
   },
 ];
 
@@ -61,6 +67,7 @@ export default function BugTracker() {
   const [bugs, setBugs] = useState(INITIAL_BUGS);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Form State
@@ -68,6 +75,7 @@ export default function BugTracker() {
   const [newDesc, setNewDesc] = useState('');
   const [newPriority, setNewPriority] = useState('HIGH');
   const [newAssignee, setNewAssignee] = useState('Shihab Shoron');
+  const [newStackTrace, setNewStackTrace] = useState('');
 
   const toggleStatus = (bugId) => {
     setBugs((prev) =>
@@ -79,7 +87,6 @@ export default function BugTracker() {
     );
   };
 
-  // Delete bug handler (PM only)
   const deleteBug = (bugId) => {
     if (!isProjectManager) return;
     setBugs((prev) => prev.filter((b) => b.id !== bugId));
@@ -96,17 +103,47 @@ export default function BugTracker() {
       reportedBy: user?.name || 'Developer',
       assignedTo: newAssignee,
       createdAt: new Date().toISOString().split('T')[0],
+      stackTrace: newStackTrace,
     };
     setBugs([createdBug, ...bugs]);
     setIsModalOpen(false);
     setNewTitle('');
     setNewDesc('');
+    setNewStackTrace('');
+  };
+
+  const exportToCSV = () => {
+    const headers = ['ID', 'Title', 'Priority', 'Status', 'Reported By', 'Assigned To', 'Date', 'Description'];
+    const rows = bugs.map((b) => [
+      b.id,
+      `"${b.title.replace(/"/g, '""')}"`,
+      b.priority,
+      b.status,
+      `"${b.reportedBy}"`,
+      `"${b.assignedTo}"`,
+      b.createdAt,
+      `"${b.description.replace(/"/g, '""')}"`,
+    ]);
+    const csvString = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `devcollab-bugs-report-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const filteredBugs = bugs.filter((b) => {
     const matchesStatus = statusFilter === 'ALL' || b.status === statusFilter;
     const matchesPriority = priorityFilter === 'ALL' || b.priority === priorityFilter;
-    return matchesStatus && matchesPriority;
+    const matchesSearch = searchQuery
+      ? b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        b.reportedBy.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return matchesStatus && matchesPriority && matchesSearch;
   });
 
   const openCount = bugs.filter((b) => b.status === 'OPEN').length;
@@ -134,12 +171,20 @@ export default function BugTracker() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold shadow-lg shadow-rose-600/20 transition cursor-pointer self-start md:self-auto"
-        >
-          <Plus size={16} /> Report Bug
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={exportToCSV}
+            className="flex items-center gap-2 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg text-xs font-semibold transition cursor-pointer"
+          >
+            <Download size={14} /> Export CSV
+          </button>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold shadow-lg shadow-rose-600/20 transition cursor-pointer"
+          >
+            <Plus size={16} /> Report Bug
+          </button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -176,37 +221,51 @@ export default function BugTracker() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 p-3 bg-slate-900/80 border border-slate-800 rounded-xl mb-6">
-        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium mr-2">
-          <Filter size={14} /> Filters:
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-slate-900/80 border border-slate-800 rounded-xl mb-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium mr-1">
+            <Filter size={14} /> Filters:
+          </div>
+
+          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
+            {['ALL', 'OPEN', 'RESOLVED'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                  statusFilter === status
+                    ? 'bg-slate-800 text-white font-semibold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+
+          <select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-rose-500"
+          >
+            <option value="ALL">All Priorities</option>
+            <option value="HIGH">High Priority</option>
+            <option value="MEDIUM">Medium Priority</option>
+            <option value="LOW">Low Priority</option>
+          </select>
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
-          {['ALL', 'OPEN', 'RESOLVED'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
-                statusFilter === status
-                  ? 'bg-slate-800 text-white font-semibold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {status}
-            </button>
-          ))}
+        {/* Search */}
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search bugs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-white text-xs focus:outline-none focus:border-rose-500 w-48"
+          />
         </div>
-
-        <select
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-          className="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-rose-500"
-        >
-          <option value="ALL">All Priorities</option>
-          <option value="HIGH">High Priority</option>
-          <option value="MEDIUM">Medium Priority</option>
-          <option value="LOW">Low Priority</option>
-        </select>
       </div>
 
       {/* Issues List */}
@@ -268,7 +327,6 @@ export default function BugTracker() {
                   )}
                 </button>
 
-                {/* DELETE BUTTON (PROJECT MANAGER ONLY) */}
                 {isProjectManager && (
                   <button
                     onClick={() => deleteBug(bug.id)}
@@ -282,9 +340,15 @@ export default function BugTracker() {
               </div>
             </div>
 
-            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
+            <p className="text-sm text-slate-400 mb-3 leading-relaxed">
               {bug.description}
             </p>
+
+            {bug.stackTrace && (
+              <pre className="p-2.5 mb-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-rose-400/90 overflow-x-auto">
+                {bug.stackTrace}
+              </pre>
+            )}
 
             <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-3 border-t border-slate-800">
               <span className="flex items-center gap-1.5">
@@ -336,8 +400,19 @@ export default function BugTracker() {
                   required
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  placeholder="Provide context, error messages, or steps to reproduce..."
+                  placeholder="Provide context or steps to reproduce..."
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:border-rose-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Error Trace / Stack Logs (Optional)</label>
+                <input
+                  type="text"
+                  value={newStackTrace}
+                  onChange={(e) => setNewStackTrace(e.target.value)}
+                  placeholder="e.g. TypeError or 500 Internal Server Error..."
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs font-mono focus:border-rose-500 focus:outline-none"
                 />
               </div>
 
