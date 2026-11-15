@@ -232,7 +232,7 @@ function AppContent() {
   return (
     <>
       {/* 3D Animated WebGL Canvas (At z-0) */}
-      <ThreeBackground />
+      
 
       <DailyStandupModal
         isOpen={showStandupModal}
