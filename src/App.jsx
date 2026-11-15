@@ -27,7 +27,7 @@ import {
   Battery
 } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import ThreeBackground from './components/ThreeBackground';
+
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import KanbanPage from './pages/KanbanPage';
