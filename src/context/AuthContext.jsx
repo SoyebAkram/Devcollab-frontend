@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext(null);
 
@@ -8,9 +8,9 @@ export const AuthProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const login = (userData) => {
+  const login = (userData, token = 'mock-jwt-token-xyz') => {
     localStorage.setItem('devcollab_user', JSON.stringify(userData));
-    localStorage.setItem('devcollab_token', 'mock-jwt-token-xyz');
+    localStorage.setItem('devcollab_token', token);
     setUser(userData);
   };
 
