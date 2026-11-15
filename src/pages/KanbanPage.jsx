@@ -1,137 +1,97 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { 
-  Plus, 
-  Calendar, 
-  ChevronRight, 
-  ChevronLeft, 
-  Filter,
+import {
+  Kanban as KanbanIcon,
+  Plus,
   Search,
-  MessageSquare,
-  GitBranch,
-  CheckSquare,
-  Square,
-  Code,
-  X,
-  Send
+  Filter,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  ArrowRight,
+  ArrowLeft,
+  Trash2,
+  User,
+  X
 } from 'lucide-react';
-
-const COLUMNS = [
-  { id: 'TODO', title: 'TO DO', color: 'border-slate-600 bg-slate-800/40 text-slate-300' },
-  { id: 'IN_PROGRESS', title: 'IN PROGRESS', color: 'border-blue-500/50 bg-blue-500/10 text-blue-400' },
-  { id: 'REVIEW', title: 'REVIEW', color: 'border-purple-500/50 bg-purple-500/10 text-purple-400' },
-  { id: 'DONE', title: 'DONE', color: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' },
-];
-
-const INITIAL_TASKS = [
-  {
-    id: 1,
-    title: 'Setup JWT Authentication API',
-    description: 'Implement token generation and role verification in FastAPI.',
-    priority: 'HIGH',
-    status: 'DONE',
-    assignedTo: 'Shihab Shoron',
-    assignedEmail: 'dev@devcollab.local',
-    dueDate: '2026-10-15',
-    gitBranch: 'feat/auth-jwt',
-    codeSnippet: 'from fastapi import Depends, HTTPException\nfrom jose import jwt\n\ndef verify_token(token: str): ...',
-    checklist: [
-      { id: 101, text: 'Define User SQLAlchemy Model', done: true },
-      { id: 102, text: 'Configure bcrypt password hashing', done: true },
-      { id: 103, text: 'Test token expiry handling in Axios', done: true }
-    ],
-    comments: [
-      { id: 201, author: 'Soyeb Akram', text: 'Ensure access tokens expire in 60 minutes.', time: 'Oct 10, 10:30 AM' },
-      { id: 202, author: 'Shihab Shoron', text: 'Configured. Refresh token rotation added.', time: 'Oct 11, 2:15 PM' }
-    ]
-  },
-  {
-    id: 2,
-    title: 'Design PostgreSQL Schema with Alembic',
-    description: 'Create tables for users, projects, tasks, and bugs with migration scripts.',
-    priority: 'HIGH',
-    status: 'IN_PROGRESS',
-    assignedTo: 'Shihab Shoron',
-    assignedEmail: 'dev@devcollab.local',
-    dueDate: '2026-10-18',
-    gitBranch: 'feat/postgres-schema',
-    codeSnippet: 'class Task(Base):\n    __tablename__ = "tasks"\n    id = Column(Integer, primary_key=True)\n    status = Column(Enum(TaskStatus))',
-    checklist: [
-      { id: 104, text: 'Draft foreign keys for Project memberships', done: true },
-      { id: 105, text: 'Generate initial Alembic migration file', done: false }
-    ],
-    comments: [
-      { id: 203, author: 'Shihab Shoron', text: 'Working on Alembic revision autogen.', time: 'Yesterday' }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Build Kanban Drag & Drop View',
-    description: 'Responsive cards with stage transitions, checklists, and priority badges.',
-    priority: 'MEDIUM',
-    status: 'TODO',
-    assignedTo: 'Soyeb Akram',
-    assignedEmail: 'pm@devcollab.local',
-    dueDate: '2026-10-20',
-    gitBranch: 'feat/kanban-board',
-    codeSnippet: '',
-    checklist: [
-      { id: 106, text: 'Support card modal details view', done: true },
-      { id: 107, text: 'Integrate discussion comment thread', done: true },
-      { id: 108, text: 'Connect drag-and-drop listener', done: false }
-    ],
-    comments: []
-  },
-  {
-    id: 4,
-    title: 'Bug Report Modal & API Integration',
-    description: 'Allow developers to submit bugs with priority and reproducibility steps.',
-    priority: 'LOW',
-    status: 'REVIEW',
-    assignedTo: 'Shihab Shoron',
-    assignedEmail: 'dev@devcollab.local',
-    dueDate: '2026-10-22',
-    gitBranch: 'feat/bug-tracker',
-    codeSnippet: '',
-    checklist: [
-      { id: 109, text: 'Create BugTracker page layout', done: true },
-      { id: 110, text: 'Add PM delete capability', done: true }
-    ],
-    comments: [
-      { id: 204, author: 'Soyeb Akram', text: 'Checked PM delete function on mobile. Works cleanly.', time: 'Today' }
-    ]
-  },
-];
+import { useAuth } from '../context/AuthContext';
 
 export default function KanbanPage() {
   const { user, isProjectManager } = useAuth();
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
-  const [showMyTasksOnly, setShowMyTasksOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [newCommentText, setNewCommentText] = useState('');
 
-  // New Task Form State
+  const [tasks, setTasks] = useState([
+    {
+      id: 'TASK-1',
+      title: 'Build Kanban Drag & Drop View',
+      description: 'Implement responsive columns, task state mutations, and touch controls for mobile viewports.',
+      stage: 'TODO',
+      priority: 'MEDIUM',
+      assignee: 'Soyeb Akram',
+      reporter: 'Soyeb Akram',
+      deadline: '2026-11-15'
+    },
+    {
+      id: 'TASK-2',
+      title: 'Design PostgreSQL Schema with Alembic',
+      description: 'Configure migration scripts for audit trail, role permissions, and sprint task relationships.',
+      stage: 'IN_PROGRESS',
+      priority: 'HIGH',
+      assignee: 'Shihab Shoron',
+      reporter: 'Shihab Shoron',
+      deadline: '2026-11-12'
+    },
+    {
+      id: 'TASK-3',
+      title: 'Bug Report Modal & API Integration',
+      description: 'Connect form submission handlers, error logging, and export to CSV endpoints.',
+      stage: 'REVIEW',
+      priority: 'LOW',
+      assignee: 'Shihab Shoron',
+      reporter: 'Soyeb Akram',
+      deadline: '2026-11-10'
+    },
+    {
+      id: 'TASK-4',
+      title: 'Setup JWT Auth API',
+      description: 'Implement token issuance, role-based claims (PM vs Developer), and token refresh middleware.',
+      stage: 'DONE',
+      priority: 'HIGH',
+      assignee: 'Soyeb Akram',
+      reporter: 'Dr. Umme Khatuna Jannat',
+      deadline: '2026-11-05'
+    }
+  ]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState('ALL');
+  const [mobileActiveStage, setMobileActiveStage] = useState('ALL');
+  const [showNewTaskModal, setShowNewTaskModal] = useState(false);
+
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newPriority, setNewPriority] = useState('MEDIUM');
-  const [newAssignee, setNewAssignee] = useState('Shihab Shoron');
-  const [newDueDate, setNewDueDate] = useState('');
-  const [newGitBranch, setNewGitBranch] = useState('feat/new-task');
+  const [newStage, setNewStage] = useState('TODO');
+  const [newAssignee, setNewAssignee] = useState('Soyeb Akram');
+
+  // Ultra-Transparent Frosted Glass Columns (20%-30% opacity)
+  const columns = [
+    { id: 'TODO', label: 'TO DO', color: 'border-slate-500/20 bg-[#060E1A]/25', badgeColor: 'bg-slate-800/80 text-slate-300' },
+    { id: 'IN_PROGRESS', label: 'IN PROGRESS', color: 'border-sky-500/30 bg-[#060E1A]/35', badgeColor: 'bg-sky-500/20 text-sky-300 border border-sky-500/30' },
+    { id: 'REVIEW', label: 'REVIEW', color: 'border-purple-500/30 bg-[#060E1A]/35', badgeColor: 'bg-purple-500/20 text-purple-300 border border-purple-500/30' },
+    { id: 'DONE', label: 'DONE', color: 'border-emerald-500/30 bg-[#060E1A]/35', badgeColor: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' }
+  ];
+
+  const stageOrder = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
 
   const moveTask = (taskId, direction) => {
-    if (!isProjectManager) return;
-    const order = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
-    setTasks((prev) =>
-      prev.map((task) => {
+    setTasks(prev =>
+      prev.map(task => {
         if (task.id === taskId) {
-          const currentIndex = order.indexOf(task.status);
+          const currentIndex = stageOrder.indexOf(task.stage);
           const nextIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
-          if (nextIndex >= 0 && nextIndex < order.length) {
-            const updated = { ...task, status: order[nextIndex] };
-            if (selectedTask?.id === taskId) setSelectedTask(updated);
-            return updated;
+          if (nextIndex >= 0 && nextIndex < stageOrder.length) {
+            const nextStage = stageOrder[nextIndex];
+            logAudit('MOVE_TASK', `Moved ${task.id} (${task.title}) to ${nextStage}`);
+            return { ...task, stage: nextStage };
           }
         }
         return task;
@@ -139,248 +99,264 @@ export default function KanbanPage() {
     );
   };
 
+  const deleteTask = (taskId) => {
+    if (!isProjectManager) {
+      alert('Only Project Managers have permission to delete tasks.');
+      return;
+    }
+    const target = tasks.find(t => t.id === taskId);
+    if (window.confirm(`Delete ${taskId}?`)) {
+      setTasks(prev => prev.filter(t => t.id !== taskId));
+      logAudit('DELETE_TASK', `Deleted task ${taskId}: ${target?.title || ''}`);
+    }
+  };
+
+  const logAudit = (action, details) => {
+    try {
+      const existing = JSON.parse(localStorage.getItem('devcollab_audit_logs') || '[]');
+      const newEntry = {
+        id: `AUD-${Date.now().toString().slice(-4)}`,
+        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        user: user?.name || (isProjectManager ? 'Soyeb Akram (PM)' : 'Shihab Shoron (Dev)'),
+        role: isProjectManager ? 'Project Manager' : 'Developer',
+        action,
+        details,
+        status: 'SUCCESS'
+      };
+      localStorage.setItem('devcollab_audit_logs', JSON.stringify([newEntry, ...existing]));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleCreateTask = (e) => {
     e.preventDefault();
-    const createdTask = {
-      id: Date.now(),
-      title: newTitle,
-      description: newDesc,
+    if (!newTitle.trim()) return;
+
+    const newId = `TASK-${tasks.length + 1}`;
+    const newTask = {
+      id: newId,
+      title: newTitle.trim(),
+      description: newDesc.trim() || 'No description provided.',
+      stage: newStage,
       priority: newPriority,
-      status: 'TODO',
-      assignedTo: newAssignee,
-      assignedEmail: newAssignee === 'Soyeb Akram' ? 'pm@devcollab.local' : 'dev@devcollab.local',
-      dueDate: newDueDate || '2026-10-31',
-      gitBranch: newGitBranch || 'feat/task',
-      checklist: [{ id: Date.now() + 1, text: 'Initial implementation', done: false }],
-      comments: [],
-      codeSnippet: '',
+      assignee: newAssignee,
+      reporter: user?.name || 'Soyeb Akram',
+      deadline: '2026-11-30'
     };
-    setTasks([createdTask, ...tasks]);
-    setIsModalOpen(false);
+
+    setTasks([...tasks, newTask]);
+    logAudit('CREATE_TASK', `Created task ${newId}: ${newTask.title} in ${newStage}`);
+
     setNewTitle('');
     setNewDesc('');
+    setShowNewTaskModal(false);
   };
 
-  const toggleChecklistItem = (taskId, itemId) => {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === taskId) {
-          const updatedChecklist = t.checklist.map((item) =>
-            item.id === itemId ? { ...item, done: !item.done } : item
-          );
-          const updatedTask = { ...t, checklist: updatedChecklist };
-          if (selectedTask?.id === taskId) setSelectedTask(updatedTask);
-          return updatedTask;
-        }
-        return t;
-      })
-    );
-  };
-
-  const handleAddComment = (e) => {
-    e.preventDefault();
-    if (!newCommentText.trim() || !selectedTask) return;
-
-    const newComment = {
-      id: Date.now(),
-      author: user?.name || 'Team Member',
-      text: newCommentText.trim(),
-      time: 'Just now',
-    };
-
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === selectedTask.id) {
-          const updatedTask = { ...t, comments: [...t.comments, newComment] };
-          setSelectedTask(updatedTask);
-          return updatedTask;
-        }
-        return t;
-      })
-    );
-    setNewCommentText('');
-  };
-
-  const filteredTasks = tasks.filter((t) => {
-    const matchesUser = showMyTasksOnly ? t.assignedEmail === user?.email : true;
-    const matchesSearch = searchQuery
-      ? t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.assignedTo.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-    return matchesUser && matchesSearch;
+  const filteredTasks = tasks.filter(task => {
+    const matchesSearch =
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.assignee.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesPriority = priorityFilter === 'ALL' || task.priority === priorityFilter;
+    return matchesSearch && matchesPriority;
   });
 
   const getPriorityBadge = (priority) => {
     switch (priority) {
+      case 'CRITICAL':
+        return 'bg-purple-500/15 text-purple-300 border-purple-500/30';
       case 'HIGH':
-        return 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+        return 'bg-rose-500/15 text-rose-300 border-rose-500/30';
       case 'MEDIUM':
-        return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+      case 'LOW':
+        return 'bg-sky-500/15 text-sky-300 border-sky-500/30';
       default:
-        return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
+        return 'bg-slate-500/15 text-slate-300 border-slate-500/30';
     }
   };
 
+  const displayedColumns = mobileActiveStage === 'ALL'
+    ? columns
+    : columns.filter(c => c.id === mobileActiveStage);
+
   return (
-    <div>
-      {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Project Kanban Board</h1>
-          <p className="text-slate-400 text-sm mt-1">
+    <div className="w-full max-w-full overflow-x-hidden box-border space-y-4">
+      {/* Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <KanbanIcon className="w-5 h-5 sm:w-6 sm:h-6 text-sky-400 shrink-0" />
+            <span className="truncate">Project Kanban Board</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
             Visual workflow stages: To Do → In Progress → Review → Done
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Search Box */}
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-2.5 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-white text-xs focus:outline-none focus:border-orange-500 w-44"
-            />
-          </div>
+        <button
+          onClick={() => setShowNewTaskModal(true)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 transition shadow-md shadow-sky-500/25 border border-sky-400/30 self-start sm:self-auto cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          <span>New Task</span>
+        </button>
+      </div>
 
-          <button
-            onClick={() => setShowMyTasksOnly(!showMyTasksOnly)}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
-              showMyTasksOnly
-                ? 'bg-orange-500/20 border-orange-500/40 text-orange-400'
-                : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'
-            }`}
+      {/* Transparent Search & Filter Bar */}
+      <div className="bg-[#060E1A]/35 backdrop-blur-xl border border-sky-500/20 p-3 rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full shadow-sm">
+        <div className="relative flex-1 min-w-0">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search tasks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-[#060E1A]/40 border border-sky-500/25 rounded-lg pl-9 pr-3 py-1.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="bg-[#060E1A]/40 border border-sky-500/25 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-400 cursor-pointer w-full sm:w-auto"
           >
-            <Filter size={13} />
-            {showMyTasksOnly ? 'My Tasks' : 'All Tasks'}
-          </button>
-
-          {isProjectManager && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs font-semibold shadow-lg shadow-orange-600/20 transition cursor-pointer"
-            >
-              <Plus size={15} /> New Task
-            </button>
-          )}
+            <option value="ALL">All Priorities</option>
+            <option value="CRITICAL">Critical</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+          </select>
         </div>
       </div>
 
-      {/* Kanban Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {COLUMNS.map((col) => {
-          const colTasks = filteredTasks.filter((t) => t.status === col.id);
+      {/* Mobile Column Switcher Tabs */}
+      <div className="flex sm:hidden items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none w-full">
+        <button
+          onClick={() => setMobileActiveStage('ALL')}
+          className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 transition ${
+            mobileActiveStage === 'ALL'
+              ? 'bg-sky-600 text-white shadow-sm shadow-sky-500/20'
+              : 'bg-[#060E1A]/40 text-slate-400 border border-sky-500/20'
+          }`}
+        >
+          All Stages ({filteredTasks.length})
+        </button>
+        {columns.map(c => {
+          const count = filteredTasks.filter(t => t.stage === c.id).length;
+          return (
+            <button
+              key={c.id}
+              onClick={() => setMobileActiveStage(c.id)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium shrink-0 transition ${
+                mobileActiveStage === c.id
+                  ? 'bg-sky-600 text-white shadow-sm shadow-sky-500/20'
+                  : 'bg-[#060E1A]/40 text-slate-400 border border-sky-500/20'
+              }`}
+            >
+              {c.label} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Transparent Kanban Columns (Revealing 3D Background) */}
+      <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 overflow-x-auto sm:overflow-visible pb-4 pt-1 snap-x snap-mandatory box-border w-full">
+        {displayedColumns.map(col => {
+          const columnTasks = filteredTasks.filter(t => t.stage === col.id);
+          const colIndex = stageOrder.indexOf(col.id);
 
           return (
             <div
               key={col.id}
-              className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 flex flex-col min-h-[520px]"
+              className={`w-[82vw] max-w-[320px] sm:w-auto sm:max-w-none shrink-0 snap-center rounded-2xl border ${col.color} p-3 sm:p-3.5 flex flex-col min-h-[460px] backdrop-blur-xl shadow-lg transition-all hover:border-sky-500/40`}
             >
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-                <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border ${col.color}`}>
-                  {col.title}
-                </span>
-                <span className="text-xs font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">
-                  {colTasks.length}
-                </span>
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-sky-500/15">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-xs sm:text-sm text-white tracking-wide">
+                    {col.label}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${col.badgeColor}`}>
+                    {columnTasks.length}
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-3 flex-1 overflow-y-auto">
-                {colTasks.map((task) => {
-                  const completedChecklist = task.checklist?.filter((c) => c.done).length || 0;
-                  const totalChecklist = task.checklist?.length || 0;
-
-                  return (
+                {columnTasks.length === 0 ? (
+                  <div className="h-32 border-2 border-dashed border-sky-500/20 rounded-xl flex items-center justify-center text-xs text-slate-500 font-medium">
+                    No tasks in {col.label}
+                  </div>
+                ) : (
+                  columnTasks.map(task => (
                     <div
                       key={task.id}
-                      onClick={() => setSelectedTask(task)}
-                      className="bg-slate-800/90 border border-slate-700/70 hover:border-orange-500/50 rounded-xl p-4 shadow-sm transition cursor-pointer group"
+                      className="bg-[#0B1526]/35 hover:bg-[#0B1526]/55 backdrop-blur-md border border-sky-500/20 hover:border-sky-500/50 rounded-xl p-3.5 shadow-md transition space-y-2.5 box-border w-full"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <span
-                          className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getPriorityBadge(
-                            task.priority
-                          )}`}
-                        >
+                      <div className="flex items-center justify-between gap-1 w-full">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getPriorityBadge(task.priority)}`}>
                           {task.priority}
                         </span>
-                        <span className="flex items-center gap-1 text-[11px] text-slate-400">
-                          <Calendar size={12} /> {task.dueDate}
+                        <span className="text-[10px] font-mono text-slate-400">
+                          {task.id}
                         </span>
                       </div>
 
-                      <h3 className="text-sm font-semibold text-white group-hover:text-orange-400 transition mb-1.5">
+                      <h4 className="text-xs sm:text-sm font-semibold text-white leading-snug break-words">
                         {task.title}
-                      </h3>
-                      <p className="text-xs text-slate-400 mb-3 line-clamp-2 leading-relaxed">
+                      </h4>
+
+                      <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed line-clamp-2 break-words">
                         {task.description}
                       </p>
 
-                      {/* Mini Metadata Indicators */}
-                      <div className="flex items-center gap-3 text-[11px] text-slate-400 mb-3">
-                        {task.gitBranch && (
-                          <span className="flex items-center gap-1 font-mono text-slate-300 bg-slate-900/80 px-2 py-0.5 rounded">
-                            <GitBranch size={11} className="text-orange-400" />
-                            {task.gitBranch}
-                          </span>
-                        )}
-                        {totalChecklist > 0 && (
-                          <span className="flex items-center gap-1">
-                            <CheckSquare size={11} className="text-emerald-400" />
-                            {completedChecklist}/{totalChecklist}
-                          </span>
-                        )}
-                        {task.comments?.length > 0 && (
-                          <span className="flex items-center gap-1">
-                            <MessageSquare size={11} className="text-blue-400" />
-                            {task.comments.length}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="pt-3 border-t border-slate-700/60 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-xs text-slate-300">
-                          <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold text-orange-400">
-                            {task.assignedTo[0]}
+                      <div className="pt-2 border-t border-sky-500/15 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <div className="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-500/30 text-sky-400 font-bold text-[10px] flex items-center justify-center shrink-0">
+                            {task.assignee[0]}
                           </div>
-                          <span className="text-[11px] truncate max-w-[90px]">{task.assignedTo}</span>
+                          <span className="text-[11px] text-slate-300 truncate font-medium">
+                            {task.assignee}
+                          </span>
                         </div>
 
-                        {/* Direction Shift Controls (PM Only) */}
-                        {isProjectManager && (
-                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                            {col.id !== 'TODO' && (
-                              <button
-                                onClick={() => moveTask(task.id, 'prev')}
-                                title="Move back"
-                                className="p-1 rounded bg-slate-700/60 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
-                              >
-                                <ChevronLeft size={14} />
-                              </button>
-                            )}
-                            {col.id !== 'DONE' && (
-                              <button
-                                onClick={() => moveTask(task.id, 'next')}
-                                title="Move forward"
-                                className="p-1 rounded bg-slate-700/60 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
-                              >
-                                <ChevronRight size={14} />
-                              </button>
-                            )}
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 shrink-0">
+                          {colIndex > 0 && (
+                            <button
+                              onClick={() => moveTask(task.id, 'prev')}
+                              className="p-1 rounded bg-[#060E1A]/60 hover:bg-sky-500/20 text-slate-400 hover:text-white transition cursor-pointer border border-sky-500/20"
+                              title={`Move to ${stageOrder[colIndex - 1]}`}
+                            >
+                              <ArrowLeft className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
+                          {colIndex < stageOrder.length - 1 && (
+                            <button
+                              onClick={() => moveTask(task.id, 'next')}
+                              className="p-1 rounded bg-[#060E1A]/60 hover:bg-sky-500/20 text-slate-400 hover:text-white transition cursor-pointer border border-sky-500/20"
+                              title={`Move to ${stageOrder[colIndex + 1]}`}
+                            >
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+
+                          {isProjectManager && (
+                            <button
+                              onClick={() => deleteTask(task.id)}
+                              className="p-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition cursor-pointer border border-rose-500/30"
+                              title="Delete Task (PM Only)"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
-
-                {colTasks.length === 0 && (
-                  <div className="h-32 border border-dashed border-slate-800 rounded-xl flex items-center justify-center text-xs text-slate-500">
-                    No tasks here
-                  </div>
+                  ))
                 )}
               </div>
             </div>
@@ -388,224 +364,100 @@ export default function KanbanPage() {
         })}
       </div>
 
-      {/* Task Details & Comments Modal */}
-      {selectedTask && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-slate-800 max-w-2xl w-full rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between pb-4 border-b border-slate-800 mb-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${getPriorityBadge(selectedTask.priority)}`}>
-                    {selectedTask.priority}
-                  </span>
-                  <span className="text-xs font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">
-                    Stage: {selectedTask.status.replace('_', ' ')}
-                  </span>
-                </div>
-                <h2 className="text-xl font-bold text-white">{selectedTask.title}</h2>
-              </div>
+      {/* New Task Modal */}
+      {showNewTaskModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-[#0B1526]/90 backdrop-blur-xl border border-sky-500/30 rounded-2xl w-full max-w-md p-5 shadow-2xl relative">
+            <div className="flex items-center justify-between pb-3 border-b border-sky-500/20">
+              <h3 className="font-bold text-white text-base">Create New Kanban Task</h3>
               <button
-                onClick={() => setSelectedTask(null)}
-                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
+                onClick={() => setShowNewTaskModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 cursor-pointer"
               >
-                <X size={18} />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Description */}
-            <div className="mb-6">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Description</h4>
-              <p className="text-sm text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
-                {selectedTask.description}
-              </p>
-            </div>
-
-            {/* Metadata Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+            <form onSubmit={handleCreateTask} className="mt-4 space-y-3">
               <div>
-                <span className="text-slate-500 block">Assigned Developer</span>
-                <strong className="text-slate-200">{selectedTask.assignedTo}</strong>
-              </div>
-              <div>
-                <span className="text-slate-500 block">Target Due Date</span>
-                <strong className="text-slate-200">{selectedTask.dueDate}</strong>
-              </div>
-              <div>
-                <span className="text-slate-500 block">Git Branch</span>
-                <span className="font-mono text-orange-400">{selectedTask.gitBranch}</span>
-              </div>
-            </div>
-
-            {/* Code Snippet Box (If present) */}
-            {selectedTask.codeSnippet && (
-              <div className="mb-6">
-                <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                  <Code size={14} className="text-orange-400" /> Associated Code / Implementation
-                </h4>
-                <pre className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-xs text-emerald-400 overflow-x-auto">
-                  {selectedTask.codeSnippet}
-                </pre>
-              </div>
-            )}
-
-            {/* Sub-Task Checklist */}
-            <div className="mb-6">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                Acceptance Criteria Checklist
-              </h4>
-              <div className="space-y-2">
-                {selectedTask.checklist?.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => toggleChecklistItem(selectedTask.id, item.id)}
-                    className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-950/80 border border-slate-800/80 hover:border-slate-700 transition cursor-pointer text-xs"
-                  >
-                    {item.done ? (
-                      <CheckSquare size={16} className="text-emerald-400 shrink-0" />
-                    ) : (
-                      <Square size={16} className="text-slate-500 shrink-0" />
-                    )}
-                    <span className={item.done ? 'line-through text-slate-500' : 'text-slate-200'}>
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Discussion Comments */}
-            <div className="border-t border-slate-800 pt-5">
-              <h4 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-                <MessageSquare size={14} className="text-blue-400" /> Team Discussion & Updates
-              </h4>
-
-              <div className="space-y-3 mb-4 max-h-48 overflow-y-auto pr-1">
-                {selectedTask.comments?.map((c) => (
-                  <div key={c.id} className="p-3 rounded-xl bg-slate-950/70 border border-slate-800/80 text-xs">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-orange-400">{c.author}</span>
-                      <span className="text-[10px] text-slate-500">{c.time}</span>
-                    </div>
-                    <p className="text-slate-300 leading-relaxed">{c.text}</p>
-                  </div>
-                ))}
-
-                {(!selectedTask.comments || selectedTask.comments.length === 0) && (
-                  <p className="text-xs text-slate-500 italic p-3 text-center bg-slate-950/40 rounded-xl">
-                    No comments yet. Start the discussion below.
-                  </p>
-                )}
-              </div>
-
-              {/* Add Comment Box */}
-              <form onSubmit={handleAddComment} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Post an update or note..."
-                  value={newCommentText}
-                  onChange={(e) => setNewCommentText(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:outline-none focus:border-orange-500"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
-                >
-                  <Send size={13} /> Send
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* New Task Modal (PM Only) */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-slate-800 max-w-md w-full rounded-2xl p-6 shadow-2xl">
-            <h2 className="text-lg font-bold text-white mb-4">Create New Task</h2>
-            <form onSubmit={handleCreateTask} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Task Title</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">
+                  Task Title <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. Implement OAuth login"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g. Implement WebSocket Real-time Sync"
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:border-orange-500 focus:outline-none"
+                  className="w-full bg-[#060E1A]/80 border border-sky-500/20 rounded-lg px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-sky-400"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Description</label>
-                <textarea
-                  rows={3}
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                  placeholder="Scope, acceptance criteria, or technical details..."
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:border-orange-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Priority</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Priority</label>
                   <select
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:border-orange-500 focus:outline-none"
+                    className="w-full bg-[#060E1A]/80 border border-sky-500/20 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-400"
                   >
-                    <option value="LOW">Low</option>
-                    <option value="MEDIUM">Medium</option>
+                    <option value="CRITICAL">Critical</option>
                     <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
                   </select>
                 </div>
+
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Assignee</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Stage</label>
                   <select
-                    value={newAssignee}
-                    onChange={(e) => setNewAssignee(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:border-orange-500 focus:outline-none"
+                    value={newStage}
+                    onChange={(e) => setNewStage(e.target.value)}
+                    className="w-full bg-[#060E1A]/80 border border-sky-500/20 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-400"
                   >
-                    <option value="Shihab Shoron">Shihab Shoron (Dev)</option>
-                    <option value="Soyeb Akram">Soyeb Akram (PM)</option>
+                    <option value="TODO">To Do</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="REVIEW">Review</option>
+                    <option value="DONE">Done</option>
                   </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Due Date</label>
-                  <input
-                    type="date"
-                    value={newDueDate}
-                    onChange={(e) => setNewDueDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:border-orange-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Git Branch</label>
-                  <input
-                    type="text"
-                    value={newGitBranch}
-                    onChange={(e) => setNewGitBranch(e.target.value)}
-                    placeholder="e.g. feat/kanban-dnd"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:border-orange-500 focus:outline-none"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Assignee</label>
+                <select
+                  value={newAssignee}
+                  onChange={(e) => setNewAssignee(e.target.value)}
+                  className="w-full bg-[#060E1A]/80 border border-sky-500/20 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-400"
+                >
+                  <option value="Soyeb Akram">Soyeb Akram (Team Lead)</option>
+                  <option value="Shihab Shoron">Shihab Abdullah Shoron</option>
+                  <option value="Dr. Umme Khatuna Jannat">Dr. Umme Khatuna Jannat</option>
+                </select>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-800">
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Description</label>
+                <textarea
+                  rows={3}
+                  placeholder="Task details and deliverables..."
+                  value={newDesc}
+                  onChange={(e) => setNewDesc(e.target.value)}
+                  className="w-full bg-[#060E1A]/80 border border-sky-500/20 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400 resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-sky-500/20">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition cursor-pointer"
+                  onClick={() => setShowNewTaskModal(false)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs font-semibold shadow-lg shadow-orange-600/20 transition cursor-pointer"
+                  className="px-4 py-1.5 rounded-lg text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 transition shadow-md shadow-sky-500/20"
                 >
                   Create Task
                 </button>
