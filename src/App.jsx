@@ -285,7 +285,6 @@ function AppContent() {
                     DevCollab
                     <span className="text-[10px] px-1 py-0.2 rounded bg-sky-500/20 text-sky-400 font-mono">v2.0</span>
                   </div>
-                  <div className="text-[10px] text-slate-400 leading-none">CSE Dept, UITS</div>
                 </div>
               </button>
 
@@ -438,7 +437,6 @@ function AppContent() {
                       v2.0
                     </span>
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">CSE Dept, UITS</div>
                 </div>
               </button>
             </div>
